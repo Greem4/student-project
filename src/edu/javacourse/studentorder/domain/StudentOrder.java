@@ -1,5 +1,7 @@
 package edu.javacourse.studentorder.domain;
 
+import edu.javacourse.studentorder.domain.other.Adult;
+
 public class StudentOrder {
     private Long studentOrderId;
     private Adult husband;
