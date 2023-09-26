@@ -6,7 +6,7 @@ import edu.javacourse.studentorder.domain.StudentOrder;
 public class SaveStudentOrder {
 
     public static void main(String[] args) {
-        buildStudentOrder(1);
+       StudentOrder s = buildStudentOrder(10);
 
 //        StudentOrder so = new StudentOrder();
 //        long ans = saveStudentOrder(so);
@@ -23,10 +23,13 @@ public class SaveStudentOrder {
     static StudentOrder buildStudentOrder(long id) {
         StudentOrder so = new StudentOrder();
         so.setStudentOrderId(id);
-
-        Adult husband = new Adult("Васильев", "Андрей" , "Петрович",null);
-
+        StudentOrder so1 = so;
+        printStudentOrder(so1);
 
         return so;
+    }
+
+    static void printStudentOrder(StudentOrder stOr) {
+        System.out.println(stOr.getStudentOrderId());
     }
 }
