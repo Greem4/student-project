@@ -7,8 +7,6 @@ import edu.javacourse.studentorder.validator.CityRegisterValidator;
 import edu.javacourse.studentorder.validator.StudentValidator;
 import edu.javacourse.studentorder.validator.WeddingValidator;
 
-import java.util.concurrent.CyclicBarrier;
-
 public class StudentOrderValidator {
 
     private CityRegisterValidator cityRegisterValidator;
@@ -26,40 +24,46 @@ public class StudentOrderValidator {
     }
 
 
-
     public static void main(String[] args) {
-       StudentOrderValidator sov = new StudentOrderValidator();
-       sov.checkAll();
+        StudentOrderValidator sov = new StudentOrderValidator();
+        sov.checkAll();
     }
 
     public void checkAll() {
+        StudentOrder[] soArray = readStudentOrders();
 
+//        for (int i = 0; i < soArray.length; i++) {
+//            System.out.println();
+//            checkOneOrder(soArray[i]);
+//        }
 
-        while (true) {
-            StudentOrder so = readStudentOrder();
-            if (so == null) {
-                break;
-            }
-            AnswerCityRegister cityAnswer = checkCityRegister(so);
-            if (!cityAnswer.success) {
-//                continue;
-                break;
-            }
-            AnswerWedding wedAnswer = checkWedding(so);
-            AnswerChildren childAnswer = checkChildren(so);
-            AnswerStudent studentAnswer = checkStudent(so);
-
-            sendMail(so);
-
+        for (StudentOrder so : soArray) {
+            System.out.println();
+            checkOneOrder(so);
         }
+
     }
 
+    public StudentOrder[] readStudentOrders() {
+        StudentOrder[] soArray = new StudentOrder[3];
 
-    public StudentOrder readStudentOrder() {
-        SaveStudentOrder.buildStudentOrder();
-        StudentOrder so = new StudentOrder();
-        return so;
+        for (int i = 0; i < soArray.length; i++) {
+            soArray[i] = SaveStudentOrder.buildStudentOrder(i);
+        }
+        return soArray;
     }
+
+    public void checkOneOrder(StudentOrder so) {
+
+        AnswerCityRegister cityAnswer = checkCityRegister(so);
+
+        AnswerWedding wedAnswer = checkWedding(so);
+        AnswerChildren childAnswer = checkChildren(so);
+        AnswerStudent studentAnswer = checkStudent(so);
+
+        sendMail(so);
+    }
+
 
     public AnswerCityRegister checkCityRegister(StudentOrder so) {
         return cityRegisterValidator.checkCityRegister(so);
