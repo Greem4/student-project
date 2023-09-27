@@ -26,6 +26,9 @@ public class SaveStudentOrder {
         StudentOrder so1 = so;
         printStudentOrder(so1);
 
+        Adult husband = new Adult();
+        husband.getPassportSeria();
+
         return so;
     }
 
