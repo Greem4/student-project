@@ -27,6 +27,7 @@ public class StudentOrderValidator
         mailSender = new MailSender();
     }
 
+
     public static void main(String[] args) {
         StudentOrderValidator sov = new StudentOrderValidator();
         sov.checkAll();
@@ -38,13 +39,14 @@ public class StudentOrderValidator
         for(StudentOrder so : soArray) {
             checkOneOrder(so);
         }
+
     }
 
     public StudentOrder[] readStudentOrders() {
         StudentOrder[] soArray = new StudentOrder[3];
 
-        for (int c = 0; c < soArray.length; c++) {
-            soArray[c] = SaveStudentOrder.buildStudentOrder(c);
+        for (int i = 0; i < soArray.length; i++) {
+            soArray[i] = SaveStudentOrder.buildStudentOrder(i);
         }
 
         return soArray;
@@ -58,6 +60,7 @@ public class StudentOrderValidator
 
 //        sendMail(so);
     }
+
 
     public AnswerCityRegister checkCityRegister(StudentOrder so) {
         return cityRegisterVal.checkCityRegister(so);
