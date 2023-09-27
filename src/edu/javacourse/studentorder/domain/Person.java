@@ -2,7 +2,8 @@ package edu.javacourse.studentorder.domain;
 
 import java.time.LocalDate;
 
-public abstract class Person {
+public abstract class Person
+{
     private String surName;
     private String givenName;
     private String patronymic;
@@ -10,7 +11,6 @@ public abstract class Person {
     private Address address;
 
     public Person() {
-
     }
 
     public Person(String surName, String givenName, String patronymic, LocalDate dateOfBirth) {
@@ -60,4 +60,3 @@ public abstract class Person {
         this.address = address;
     }
 }
-
