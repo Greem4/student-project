@@ -23,8 +23,8 @@ public class SaveStudentOrder {
     static StudentOrder buildStudentOrder(long id) {
         StudentOrder so = new StudentOrder();
         so.setStudentOrderId(id);
-        StudentOrder so1 = so;
-        printStudentOrder(so1);
+        Adult adult = new Adult();
+        so.setHusband(adult);
 
         return so;
     }
