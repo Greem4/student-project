@@ -1,5 +1,6 @@
 package edu.javacourse.studentorder.dao;
 
+import edu.javacourse.studentorder.config.Config;
 import edu.javacourse.studentorder.domain.Street;
 import edu.javacourse.studentorder.exception.DaoException;
 
@@ -14,8 +15,9 @@ public class DictionaryDaoImpl implements DictionaryDao {
 
     private Connection getConnection() throws SQLException {
         Connection con = DriverManager.getConnection(
-                "jdbc:postgresql://localhost:5432/jc_student",
-                "greem", "414510");
+                Config.getProperty(Config.DB_URL),
+                Config.getProperty(Config.DB_LOGIN),
+                Config.getProperty(Config.DB_PASSWORD));
         return con;
     }
 
@@ -23,11 +25,10 @@ public class DictionaryDaoImpl implements DictionaryDao {
         List<Street> result = new LinkedList<>();
 
 
-
         try (Connection con = getConnection();
              PreparedStatement stmt = con.prepareStatement(GET_STREET)) {
 
-            stmt.setString(1,"%" + pattern + "%");
+            stmt.setString(1, "%" + pattern + "%");
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 Street str = new Street(rs.getLong("street_code"), rs.getString("street_name"));
