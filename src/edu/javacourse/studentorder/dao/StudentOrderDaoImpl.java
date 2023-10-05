@@ -1,10 +1,7 @@
 package edu.javacourse.studentorder.dao;
 
 import edu.javacourse.studentorder.config.Config;
-import edu.javacourse.studentorder.domain.Address;
-import edu.javacourse.studentorder.domain.Adult;
-import edu.javacourse.studentorder.domain.StudentOrder;
-import edu.javacourse.studentorder.domain.StudentOrderStatus;
+import edu.javacourse.studentorder.domain.*;
 import edu.javacourse.studentorder.exception.DaoException;
 
 import java.sql.Connection;
@@ -14,8 +11,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 
-public class StudentOrderDaoImpl implements StudentOrderDao
-{
+public class StudentOrderDaoImpl implements StudentOrderDao {
     private static final String INSERT_ORDER =
             "INSERT INTO jc_student_order(" +
                     " student_order_status, student_order_date, h_sur_name, " +
@@ -34,6 +30,15 @@ public class StudentOrderDaoImpl implements StudentOrderDao
                     " ?, ?, ?, ?, " +
                     " ?, ?, ?, ?, ?, " +
                     " ?, ?);";
+
+    private static final String INSERT_CHILD =
+            "insert into jc_student_child (student_order_id, c_sur_name, c_given_name, c_patronymic," +
+                    " c_date_of_birth, c_certificate_number, c_certificate_date, c_register_office_id," +
+                    " c_post_index, c_street_code, c_building, c_extension, c_apartment)" +
+           "values ( ?, ?, ?," +
+                    "?, ?, ?, ?, " +
+                    "?, ?, ?, ?, " +
+                    "?, ?);";
 
 
     // TODO refactoring - make one method
@@ -74,6 +79,8 @@ public class StudentOrderDaoImpl implements StudentOrderDao
             }
             gkRs.close();
 
+            saveChildren(con, so, result);
+
         } catch (SQLException ex) {
             throw new DaoException(ex);
         }
@@ -81,20 +88,46 @@ public class StudentOrderDaoImpl implements StudentOrderDao
         return result;
     }
 
+    private void saveChildren(Connection con, StudentOrder so, Long soId) throws SQLException {
+        try (PreparedStatement stmt = con.prepareStatement(INSERT_CHILD)) {
+            for (Child child : so.getChildren()) {
+                stmt.setLong(1, soId);
+                setParamsForCild(stmt, child);
+                stmt.executeUpdate();
+            }
+
+        }
+
+    }
+
     private static void setParamsForAdult(PreparedStatement stmt, int start, Adult adult) throws SQLException {
-        stmt.setString(start, adult.getSurName());
-        stmt.setString(start + 1, adult.getGivenName());
-        stmt.setString(start + 2, adult.getPatronymic());
-        stmt.setDate(start + 3, java.sql.Date.valueOf(adult.getDateOfBirth()));
+        setParamsForPerson(stmt, start, adult);
         stmt.setString(start + 4, adult.getPassportSeria());
         stmt.setString(start + 5, adult.getPassportNumber());
         stmt.setDate(start + 6, java.sql.Date.valueOf(adult.getIssueDate()));
         stmt.setLong(start + 7, adult.getIssueDepartment().getOfficeId());
-        Address h_address = adult.getAddress();
-        stmt.setString(start + 8, h_address.getPostCode());
-        stmt.setLong(start + 9, h_address.getStreet().getStreetCode());
-        stmt.setString(start + 10, h_address.getBuilding());
-        stmt.setString(start + 11, h_address.getExtension());
-        stmt.setString(start + 12, h_address.getApartment());
+        setParamsForAddress(stmt, start + 8, adult);
+    }
+    private void setParamsForCild(PreparedStatement stmt, Child child) throws SQLException {
+        setParamsForPerson(stmt, 2, child);
+        stmt.setString(6, child.getCertificateNumber());
+        stmt.setDate(7, java.sql.Date.valueOf(child.getIssueDate()));
+        stmt.setLong(8, child.getIssueDepartment().getOfficeId());
+        setParamsForAddress(stmt, 9, child);
+    }
+
+    private static void setParamsForPerson(PreparedStatement stmt, int start, Person person) throws SQLException {
+        stmt.setString(start, person.getSurName());
+        stmt.setString(start + 1, person.getGivenName());
+        stmt.setString(start + 2, person.getPatronymic());
+        stmt.setDate(start + 3, java.sql.Date.valueOf(person.getDateOfBirth()));
+    }
+    private static void setParamsForAddress(PreparedStatement stmt, int start, Person person) throws SQLException {
+        Address adult_address = person.getAddress();
+        stmt.setString(start, adult_address.getPostCode());
+        stmt.setLong(start + 1, adult_address.getStreet().getStreetCode());
+        stmt.setString(start + 2, adult_address.getBuilding());
+        stmt.setString(start + 3, adult_address.getExtension());
+        stmt.setString(start + 4, adult_address.getApartment());
     }
 }
