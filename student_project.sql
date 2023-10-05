@@ -83,7 +83,7 @@ CREATE TABLE jc_student_child
     student_child_id     SERIAL,
     student_order_id     integer      not null,
     c_sur_name           varchar(100) not null,
-    c_give_name          varchar(100) not null,
+    c_given_name          varchar(100) not null,
     c_patronymic         varchar(100) not null,
     c_date_of_birth      date         not null,
     c_certificate_number varchar(10)  not null,
