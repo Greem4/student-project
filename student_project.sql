@@ -3,7 +3,10 @@ drop table if exists jc_student_order;
 drop table if exists jc_passport_office;
 drop table if exists jc_register_office;
 drop table if exists jc_country_struct;
+drop table if exists jc_university;
 drop table if exists jc_street;
+
+
 
 create table jc_street
 (
@@ -11,6 +14,14 @@ create table jc_street
     street_name varchar(300),
     primary key (street_code)
 );
+create table jc_university
+(
+    university_id   integer not null,
+    university_name varchar(300),
+    primary key (university_id)
+);
+
+
 create table jc_country_struct
 (
 
@@ -56,6 +67,8 @@ CREATE TABLE jc_student_order
     h_building           varchar(10)  not null,
     h_extension          varchar(10),
     h_apartment          varchar(10),
+    h_university_id      integer      not null,
+    h_student_number     varchar(30)  not null,
     w_sur_name           varchar(100) not null,
     w_given_name         varchar(100) not null,
     w_patronymic         varchar(100) not null,
@@ -69,12 +82,18 @@ CREATE TABLE jc_student_order
     w_building           varchar(10)  not null,
     w_extension          varchar(10),
     w_apartment          varchar(10),
+    w_university_id      integer      not null,
+    w_student_number     varchar(30)  not null,
     certificate_id       varchar(20)  not null,
     register_office_id   integer      not null,
     marriage_date        date         not null,
     PRIMARY KEY (student_order_id),
     FOREIGN KEY (h_street_code) REFERENCES jc_street (street_code) ON DELETE RESTRICT,
+    FOREIGN KEY (h_passport_office_id) REFERENCES jc_passport_office (p_office_id) ON DELETE RESTRICT,
+    FOREIGN KEY (h_university_id) REFERENCES jc_university (university_id)  ON DELETE RESTRICT,
     FOREIGN KEY (w_street_code) REFERENCES jc_street (street_code) ON DELETE RESTRICT,
+    FOREIGN KEY (w_passport_office_id) REFERENCES jc_passport_office (p_office_id) ON DELETE RESTRICT,
+    FOREIGN KEY (w_university_id) REFERENCES jc_university (university_id)  ON DELETE RESTRICT,
     FOREIGN KEY (register_office_id) REFERENCES jc_register_office (r_office_id) ON DELETE RESTRICT
 );
 
@@ -83,7 +102,7 @@ CREATE TABLE jc_student_child
     student_child_id     SERIAL,
     student_order_id     integer      not null,
     c_sur_name           varchar(100) not null,
-    c_give_name          varchar(100) not null,
+    c_given_name          varchar(100) not null,
     c_patronymic         varchar(100) not null,
     c_date_of_birth      date         not null,
     c_certificate_number varchar(10)  not null,
