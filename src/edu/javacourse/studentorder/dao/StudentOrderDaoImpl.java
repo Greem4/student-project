@@ -105,9 +105,7 @@ public class StudentOrderDaoImpl implements StudentOrderDao {
                 setParamsForCild(stmt, child);
                 stmt.executeUpdate();
             }
-
         }
-
     }
 
     private static void setParamsForAdult(PreparedStatement stmt, int start, Adult adult) throws SQLException {
