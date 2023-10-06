@@ -10,6 +10,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.LinkedList;
+import java.util.List;
 
 public class StudentOrderDaoImpl implements StudentOrderDao {
     private static final String INSERT_ORDER =
@@ -39,6 +41,9 @@ public class StudentOrderDaoImpl implements StudentOrderDao {
                     "?, ?, ?, ?, " +
                     "?, ?, ?, ?, " +
                     "?, ?);";
+
+    private static final String SELECT_ORDERS =
+            "SELECT * FROM jc_student_order WHERE student_order_status = 0 ORDER BY student_order_date ";
 
 
     // TODO refactoring - make one method
@@ -97,11 +102,49 @@ public class StudentOrderDaoImpl implements StudentOrderDao {
         return result;
     }
 
+    @Override
+    public List<StudentOrder> getStudentOrders() throws DaoException {
+        List<StudentOrder> result = new LinkedList<>();
+
+        try (Connection con = getConnection();
+             PreparedStatement stmt = con.prepareStatement(SELECT_ORDERS)) {
+
+                 ResultSet rs = stmt.executeQuery();
+                 while (rs.next()) {
+                     StudentOrder so = new StudentOrder();
+                     fillStudentOrder(rs, so);
+                     fillMarriage(rs, so);
+
+                     result.add(so);
+                 }
+
+                 rs.close();
+        }catch (SQLException ex) {
+                 throw new DaoException(ex);
+        }
+        return result;
+    }
+
+    private void fillStudentOrder(ResultSet rs, StudentOrder so) throws SQLException {
+        so.setStudentOrderId(rs.getLong("student_order_id"));
+        so.setStudentOrderDate(rs.getTimestamp("student_order_date").toLocalDateTime());
+        so.setStudentOrderStatus(StudentOrderStatus.fromValue(rs.getInt("student_order_status")));
+    }
+
+    private void fillMarriage(ResultSet rs, StudentOrder so) throws SQLException {
+        so.setMarriageCertificateId(rs.getString("certificate_id"));
+        so.setMarriageDate(rs.getDate("marriage_date").toLocalDate());
+
+        Long roId = rs.getLong("register_office_id");
+        RegisterOffice ro = new RegisterOffice(roId, "","");
+        so.setMarriageOffice(ro);
+    }
+
     private void saveChildren(Connection con, StudentOrder so, Long soId) throws SQLException {
         try (PreparedStatement stmt = con.prepareStatement(INSERT_CHILD)) {
             for (Child child : so.getChildren()) {
                 stmt.setLong(1, soId);
-                setParamsForCild(stmt, child);
+                setParamsForChild(stmt, child);
                 stmt.executeUpdate();
             }
         }
@@ -118,7 +161,7 @@ public class StudentOrderDaoImpl implements StudentOrderDao {
         stmt.setString(start + 14, adult.getStudentId());
     }
 
-    private void setParamsForCild(PreparedStatement stmt, Child child) throws SQLException {
+    private void setParamsForChild(PreparedStatement stmt, Child child) throws SQLException {
         setParamsForPerson(stmt, 2, child);
         stmt.setString(6, child.getCertificateNumber());
         stmt.setDate(7, java.sql.Date.valueOf(child.getIssueDate()));
